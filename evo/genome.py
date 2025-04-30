@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from nn.graphs import visualize
-from config import *
+from .nn.graphs import visualize
+from .config import *
 
 
 @dataclass

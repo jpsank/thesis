@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from collections import defaultdict
-from config import *
-from genome import Genome
-from nn.graphs import *
-from functions import activations
+from ..config import *
+from ..genome import Genome
+from ..nn.graphs import *
+from ..functions import activations
 
 
 @dataclass

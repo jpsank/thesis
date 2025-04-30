@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from collections import defaultdict
 import numpy as np
-from nn.ffnn import FeedForwardNetwork
-from config import *
-from functions import activations
+from ..nn.ffnn import FeedForwardNetwork
+from ..config import *
+from ..functions import activations
 
 
 @dataclass

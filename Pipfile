@@ -13,6 +13,8 @@ jax = "*"
 jaxlib = "*"
 pygraphviz = "*"
 networkx = "*"
+imageio = "*"
+pandas = "*"
 
 [dev-packages]
 

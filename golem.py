@@ -3,6 +3,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+import os, csv
+import imageio
+
+def get_args():
+    p = argparse.ArgumentParser("GOLEM — Game Of Life Energy-Mass CA")
+    p.add_argument("--steps",       type=int,   default=1000,  help="Number of CA iterations")
+    p.add_argument("--size",        type=int,   default=150,   help="Grid height/width")
+    # p.add_argument("--init-pattern",type=str,   default="random",
+    #                choices=["random","gosper","r-pentomino"],
+    #                help="Initial seed pattern")
+    # p.add_argument("--energy",      type=float, default=5.0,   help="Initial energy per live cell")
+    p.add_argument("--output-dir",  type=str,   default="out/golem",
+                   help="Where to dump PNG frames & stats.csv")
+    return p.parse_args()
+
 
 class EnergyNCA(nn.Module):
     def __init__(self, genome_dim, hidden=32):
@@ -131,9 +147,16 @@ def ca_step(mass, energy, genome,
 
 
 if __name__ == '__main__':
-    B, H, W = 1, 100, 100
+    args = get_args()
+    B, H, W = 1, args.size, args.size
     G       = 16
     device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    os.makedirs(os.path.join(args.output_dir, "frames"), exist_ok=True)
+    metrics_path = os.path.join(args.output_dir, "stats.csv")
+    csvfile = open(metrics_path, "w", newline="")
+    writer  = csv.writer(csvfile)
+    writer.writerow(["t", "total_mass", "total_energy", "total_conserved", "live_cells"])
 
     # neighbor conv for birth/death & diffusion (circular)
     neighbor_conv = nn.Conv2d(
@@ -166,14 +189,27 @@ if __name__ == '__main__':
 
     plt.ion()
     fig, ax = plt.subplots(figsize=(5,5))
-    total_conserved = mass.sum().item() + energy.sum().item()
-    print(f"Total mass+energy: {total_conserved}")
-    for t in range(2000):
+    # log metrics
+    total_mass   = float(mass.sum().item())
+    total_energy = float(energy.sum().item())
+    total_conserved = total_mass + total_energy
+    live_cells   = int(mass.sum().item())
+    writer.writerow([-1, total_mass, total_energy, total_conserved, live_cells])
+    for t in range(args.steps):
         mass, energy, genome = ca_step(
             mass, energy, genome,
             policy, neighbor_conv, conv_demand,
             leak=0.0, sigma=0.1, diff_rate=0.05
         )
+        
+        # log metrics
+        total_mass   = float(mass.sum().item())
+        total_energy = float(energy.sum().item())
+        total_conserved = total_mass + total_energy
+        live_cells   = int(mass.sum().item())
+        writer.writerow([t, total_mass, total_energy, total_conserved, live_cells])
+
+        # check conservation
         if not np.isclose(mass.sum().item() + energy.sum().item(), total_conserved, atol=1):
             raise ValueError("Mass+energy not conserved barring rounding errors!")
         if energy.min() < 0:
@@ -193,7 +229,17 @@ if __name__ == '__main__':
         ax.imshow(rgb, interpolation='nearest')
         ax.set_title(f't = {t}')
         ax.axis('off')
-        plt.pause(0.001)
+
+        # save a colorized frame every N steps
+        if t % 10 == 0:
+            # save via imageio
+            out_path = os.path.join(args.output_dir, "frames", f"frame_{t:05d}.png")
+            imageio.imsave(out_path, (rgb*255).astype(np.uint8))
+
+        plt.pause(0.0001)
 
     plt.ioff()
     plt.show()
+    csvfile.close()
+    print(f"Saved metrics to {metrics_path}")
+    print("Done.")

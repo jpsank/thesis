@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from collections import defaultdict
-from config import *
-from genome import Genome
-from nn.graphs import visualize, directed_from_input_to_output
-from functions import activations
+from ..config import *
+from ..genome import Genome
+from ..nn.graphs import visualize, directed_from_input_to_output
+from ..functions import activations
 
 
 @dataclass

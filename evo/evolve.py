@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from config import *
-from genome import *
+from .config import *
+from .genome import *
 
 
 @dataclass
