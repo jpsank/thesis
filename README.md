@@ -9,6 +9,29 @@ A collection of four core experiments exploring artificial-life and computationa
 
 ---
 
+## Methodology
+
+### Reaction–Diffusion Chemistry with Virtual Cells and GRNs  
+We model a two-dimensional grid as a multi-chemical reaction–diffusion medium populated by “cells” that maintain their own internal chemistry. The environment carries seven continuous species—water, carbon dioxide, oxygen, sugar, ATP, protein and a generic mitogen—that diffuse according to Fick’s law and react via a unified reaction list. Some reactions proceed slowly in the background; others are catalyzed within cells based on their internal state. Each cell occluded on a grid site holds internal channels mirroring key chemicals and abstract regulatory signals. A gene regulatory network (GRN) at each cell takes as input local environmental concentrations and its internal channels, then outputs modifications to internal and membrane-transporter channels at an ATP cost. When mitogen levels and resources exceed thresholds, cells divide—splitting internal contents and copying the GRN with mutation—while cells starved of ATP die and release their contents back into the field. This framework enables emergent gradient formation, metabolism-driven patterning, and “synthetic biology” behaviors such as differentiation-like effects and signal-triggered proliferation.
+
+### GPU-Accelerated Physics Simulation
+This experiment takes inspiration from the Biomaker CA framework ([Mordvintsev et al.](https://google-research.github.io/self-organising-systems/2023/biomaker-ca/)), which simulates a richly typed biome via simple, local cellular-automaton rules. Rather than hard-coding several cell types like they do (stem, leaf, root, seed, air, dirt, etc.), we abstract every material down to its **intermolecular force** characteristics. Each pixel's RGBA color represents a four-channel “phase” vector (solid, gas, liquid, void), and we assign each phase a **solidity** parameter that proxies bond strength—strong ionic/covalent bonds for solids, hydrogen bonds for liquids, and weak London forces for gases.
+
+At each time step, an OpenCL kernel runs over the grid and applies two core local exchanges:
+
+1. **Gravity-like exchange** with the pixel above/below, clamped by the neighbor’s solidity. This captures how denser or more strongly bonded materials resist buoyant motion.  
+2. **Diffusive exchange** with the four orthogonal neighbors, scaled by the inverse of solidity. This encodes how weakly bonded phases (e.g. air) spread rapidly, while strongly bonded phases (e.g. stone) remain localized.
+
+By tuning solidity values (e.g. 0.999 for rock, 0.5 for water, 0.001 for air), we can observe how the system self-organizes into lifelike material interactions—liquids pool, solids pile, and something like bubbles form when low-solidity “air” rises through the higher-solidity “water” matrix. A NumPy reference implementation on the CPU highlights the dramatic throughput advantage of GPU compute.  
+
+This experiment unifies falling-sand dynamics and fluid behavior, which could be useful in future artificial-life models that integrate material physics with metabolism, chemotaxis, and multicellular mechanics.
+
+### GOLEM: Game Of Life Energy–Mass  
+We extend Conway’s Game of Life by equipping each cell with explicit mass and energy quantities. In each tick, standard Life birth/death rules fire first, consuming or releasing mass and energy locally. Next, an “energy-mass routing” policy network—trained separately or evolved—computes per-cell demand, and available energy is redistributed conservatively across a 3×3 neighborhood before a small diffusion and leak step smooths the field. This transforms the binary automaton into a dissipative, resource-driven system whose emergent behaviors reflect both neighborhood topology and thermodynamic constraints.
+
+### NEAT Coevolution of Grass and Prey  
+We simulate two interacting populations—autotrophic “grass” and herbivorous “prey”—on a toroidal grid. Each individual carries a genome encoding a neural controller evolved via the NEAT algorithm. At each time step, organisms sense a local RGB neighborhood representing resource and agent distributions, forward these inputs through their phenotype network, and decide actions such as movement or reproduction. Actions consume or replenish an energy budget; individuals die when energy is depleted and reproduce when it exceeds a threshold, producing mutated offspring. Predator–prey dynamics emerge as grass evolves evasive or clustered growth patterns while prey evolve foraging and avoidance strategies, illustrating coevolution in a resource-constrained environment.  
+
 ## 📂 Directory Structure
 
 ```
