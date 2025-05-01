@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ALife Simulation Suite</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ALife Simulation Suite</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#alife-simulation-suite"
+id="toc-alife-simulation-suite">ALife Simulation Suite</a>
+<ul>
+<li><a href="#acknowledgements"
+id="toc-acknowledgements">Acknowledgements</a></li>
+<li><a href="#abstract" id="toc-abstract">Abstract</a></li>
+<li><a href="#methodology" id="toc-methodology">Methodology</a>
+<ul>
+<li><a href="#reactiondiffusion-chemistry-with-virtual-cells-grns"
+id="toc-reactiondiffusion-chemistry-with-virtual-cells-grns">Reaction–Diffusion
+Chemistry with Virtual Cells &amp; GRNs</a></li>
+<li><a href="#gpu-accelerated-physics-simulation"
+id="toc-gpu-accelerated-physics-simulation">GPU-Accelerated Physics
+Simulation</a></li>
+<li><a href="#golem-game-of-life-with-energymass-equivalence"
+id="toc-golem-game-of-life-with-energymass-equivalence">GoLEM: Game Of
+Life with Energy–Mass equivalence</a></li>
+<li><a href="#neat-coevolution-of-grass-and-prey"
+id="toc-neat-coevolution-of-grass-and-prey">NEAT Coevolution of Grass
+and Prey</a></li>
+</ul></li>
+<li><a href="#directory-structure" id="toc-directory-structure">📂
+Directory Structure</a></li>
+<li><a href="#installation" id="toc-installation">⚙️
+Installation</a></li>
+<li><a href="#running-experiments" id="toc-running-experiments">🚀
+Running Experiments</a>
+<ul>
+<li><a href="#reactiondiffusion-ca" id="toc-reactiondiffusion-ca">1.
+Reaction–Diffusion CA</a></li>
+<li><a href="#gpu-accelerated-physics-simulation-1"
+id="toc-gpu-accelerated-physics-simulation-1">2. GPU-Accelerated Physics
+Simulation</a></li>
+<li><a href="#golem-game-of-life-energy-mass"
+id="toc-golem-game-of-life-energy-mass">3. GoLEM — Game Of Life
+Energy-Mass</a></li>
+<li><a href="#neat-coevolution-grass-prey"
+id="toc-neat-coevolution-grass-prey">4. NEAT Coevolution (Grass &amp;
+Prey)</a></li>
+<li><a href="#results-visualization" id="toc-results-visualization">📈
+Results &amp; Visualization</a></li>
+</ul></li>
+<li><a href="#results" id="toc-results">📊 Results</a>
+<ul>
+<li><a href="#reactiondiffusion-chemistry-with-virtual-cells-grns-1"
+id="toc-reactiondiffusion-chemistry-with-virtual-cells-grns-1">1.
+Reaction–Diffusion Chemistry with Virtual Cells &amp; GRNs</a></li>
+<li><a href="#gpu-accelerated-physics-simulation-2"
+id="toc-gpu-accelerated-physics-simulation-2">2. GPU-Accelerated Physics
+Simulation</a></li>
+<li><a href="#golem-game-of-life-with-energymass-dynamics"
+id="toc-golem-game-of-life-with-energymass-dynamics">3. GoLEM: Game Of
+Life with Energy–Mass Dynamics</a></li>
+<li><a href="#neat-coevolution-of-grass-and-prey-1"
+id="toc-neat-coevolution-of-grass-and-prey-1">4. NEAT Coevolution of
+Grass and Prey</a></li>
+</ul></li>
+<li><a href="#discussion" id="toc-discussion">Discussion</a></li>
+<li><a href="#conclusions" id="toc-conclusions">Conclusions</a></li>
+<li><a href="#future-work" id="toc-future-work">Future Work</a></li>
+<li><a href="#citation" id="toc-citation">📖 Citation</a></li>
+<li><a href="#license" id="toc-license">📝 License</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="alife-simulation-suite">ALife Simulation Suite</h1>
+<p>A collection of four core experiments exploring artificial-life and
+computational dynamics:</p>
+<ol type="1">
+<li><strong>Reaction–Diffusion CA</strong> (<code>rd.py</code>)<br />
+</li>
+<li><strong>GPU-Accelerated Physics Simulation</strong>
+(<code>physics/__main__.py</code> + <code>diffusion.cl</code>)<br />
+</li>
+<li><strong>GoLEM: Game Of Life with Energy-Mass equivalence</strong>
+(<code>golem.py</code>)<br />
+</li>
+<li><strong>NEAT Coevolution (Grass &amp; Prey)</strong>
+(<code>evo/__main__.py</code>)</li>
+</ol>
+<hr />
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>I am grateful to my advisor, Dr. Smita Krishnaswamy, for her guidance
+and encouragement throughout this project. Thanks to Xingzhi Sun and
+Jake Kovalic for introducing me to the agent-based modeling ideas that
+inspired part of this work.</p>
+<p>Warm thanks to my friends in the Computer Science Department and my
+peers in Davenport College—our discussions over tea, coffee, or after a
+run were invaluable for troubleshooting and brainstorming.</p>
+<p>Finally, I owe my deepest appreciation to my parents and brother for
+bearing with my sometimes obsessive focus on these simulations and for
+their constant support.</p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>Life emerges from the interaction of simple physical and chemical
+processes under constraints of energy and matter. In this thesis, I
+investigate four computational models—each built on minimal local rules
+and conserved quantities—to explore how lifelike behaviors arise in
+silico.</p>
+<p>First, a <strong>reaction–diffusion chemistry</strong> framework
+embeds virtual cells, endowed with internal chemical channels and gene
+regulatory networks (GRNs), within a diffusive medium of seven species
+(H₂O, CO₂, O₂, sugar, ATP, protein, mitogen). Cells sense and respond to
+local gradients, exhibiting chemotactic trails and tandem motility
+before resource depletion drives near‐extinction.</p>
+<p>Second, a <strong>GPU-accelerated physics cellular automaton</strong>
+abstracts material phases (solid, liquid, gas, void) through a single
+“solidity” parameter per pixel. Simple gravity‐ and diffusion‐like
+exchanges, executed in parallel on the GPU, generate bubble nucleation,
+buoyant rise, and phase separation—achieved at a ∼55× speedup over a
+NumPy baseline.</p>
+<p>Third, <strong>GOLEM</strong> extends Conway’s Game of Life by
+equipping each cell with explicit mass and energy stores and routing
+energy with an evolvable neural CA policy. Here, birth and death events
+consume and release energy, yielding novel still‐life equilibria and
+transient glider oscillators stabilized by conservation laws.</p>
+<p>Finally, a <strong>NEAT‐driven grass–prey coevolution</strong>
+simulates autotrophs and herbivores whose neural controllers evolve
+sensory‐motor strategies. Grass patches develop directional growth, prey
+learn infiltration and overexploitation tactics, and unchecked predation
+leads to self‐extinction, highlighting the need for regulatory feedback
+in open‐ended evolution.</p>
+<p>Together, these experiments demonstrate that simple, physically
+motivated rules—paired with minimal control architectures and hardware
+acceleration—can reproduce core aspects of life: metabolism, movement,
+growth, adaptation, and self‐organization. This work lays a foundation
+for future artificial‐life frameworks that integrate chemistry,
+mechanics, and adaptive control across scales.</p>
+<hr />
+<h2 id="methodology">Methodology</h2>
+<h3
+id="reactiondiffusion-chemistry-with-virtual-cells-grns">Reaction–Diffusion
+Chemistry with Virtual Cells &amp; GRNs</h3>
+<p>Building on agent-based models of cancer and immune dynamics
+(e.g. the Krishnaswamy Lab’s EuclideanSimulation), this experiment
+abstracts away biochemical and cell-type specifics to focus on
+fundamental life principles. The two-dimensional grid carries seven
+continuous species—water, CO₂, O₂, sugar, ATP, protein, and a generic
+mitogen—that diffuse per Fick’s law and react via a unified reaction
+list with both background and cell-catalyzed rates.</p>
+<p>Each cell occupies one grid site and maintains <strong>three
+functional channels</strong> for every chemical:<br />
+1. <strong>Reaction channel</strong> (enzymes): positive values catalyze
+production reactions; negative values catalyze consumption.<br />
+2. <strong>Transport channel</strong> (transporters): controls active
+import or export against gradients.<br />
+3. <strong>Motor channel</strong> (motors): dictates energy-driven
+movement toward or away from chemical cues.</p>
+<p>Channels are driven by a small, evolvable neural network that takes
+environmental concentrations and a cell’s current channels as inputs and
+outputs channel update values at an ATP cost—abstracting gene-to-protein
+translation and receptor dynamics into a unified, energy-conscious
+decision process. When mitogen and resource thresholds are met, cells
+divide—splitting chemical resources and mutating network weights—while
+ATP depletion or lifespan limits trigger death and release of internal
+contents back into the field.</p>
+<p>This minimal yet biologically inspired framework emphasizes
+<strong>metabolism</strong>, <strong>chemotaxis</strong>,
+<strong>transport</strong>, and <strong>division</strong> as the core
+capabilities of life, enabling emergent gradient formation,
+differentiation-like cycles, and synthetic-biology behaviors without
+hard-coding specialized cell types.</p>
+<h3 id="gpu-accelerated-physics-simulation">GPU-Accelerated Physics
+Simulation</h3>
+<p>This experiment takes inspiration from the Biomaker CA framework (<a
+href="https://google-research.github.io/self-organising-systems/2023/biomaker-ca/">Randazzo
+et al.</a>), which simulates a richly typed biome via simple, local
+cellular-automaton rules. Rather than hard-coding several cell types
+like they do (stem, leaf, root, seed, air, dirt, etc.), we abstract
+every material down to its <strong>intermolecular force</strong>
+characteristics. Each pixel’s RGBA color represents a four-channel
+“phase” vector (solid, gas, liquid, void), and we assign each phase a
+<strong>solidity</strong> parameter that proxies bond strength—strong
+ionic/covalent bonds for solids, hydrogen bonds for liquids, and weak
+London forces for gases.</p>
+<p>At each time step, an OpenCL kernel runs over the grid and applies
+two core local exchanges:</p>
+<ol type="1">
+<li><strong>Gravity-like exchange</strong> with the pixel above/below,
+clamped by the neighbor’s solidity. This captures how denser or more
+strongly bonded materials resist buoyant motion.<br />
+</li>
+<li><strong>Diffusive exchange</strong> with the four orthogonal
+neighbors, scaled by the inverse of solidity. This encodes how weakly
+bonded phases (e.g. air) spread rapidly, while strongly bonded phases
+(e.g. stone) remain localized.</li>
+</ol>
+<p>By tuning solidity values (e.g. 0.999 for rock, 0.5 for water, 0.001
+for air), we can observe how the system self-organizes into lifelike
+material interactions—liquids pool, solids pile, and something like
+bubbles form when low-solidity “air” rises through the higher-solidity
+“water” matrix. A NumPy reference implementation on the CPU highlights
+the dramatic throughput advantage of GPU compute.</p>
+<p>This experiment unifies falling-sand dynamics and fluid behavior,
+which could be useful in future artificial-life models that integrate
+material physics with metabolism, chemotaxis, and multicellular
+mechanics.</p>
+<h3 id="golem-game-of-life-with-energymass-equivalence">GoLEM: Game Of
+Life with Energy–Mass equivalence</h3>
+<p>This experiment reimagines Conway’s Game of Life as a miniature
+physics sandbox governed by conservation laws and entropy. Inspired by
+Einstein’s <span
+class="math inline"><em>E</em> = <em>m</em><em>c</em><sup>2</sup></span>,
+we treat mass and energy as interconvertible yet globally conserved
+quantities: a cell birth consumes one unit of energy, and a cell death
+releases that energy back into the field. In the absence of life, the
+system tends toward “entropy”–increasing equilibrium under standard Life
+rules.</p>
+<p>To capture how living patterns locally decrease entropy, each cell
+carries both mass and energy stores and participates in a learned,
+decentralized energy‐routing process. We augment the binary GoL grid
+with a continuous energy channel plus a set of hidden “genome” channels.
+A neural‐policy CA—analogous to <a
+href="https://distill.pub/2020/growing-ca/">Growing Neural Cellular
+Automata</a>—reads local mass, energy, and hidden channels, then directs
+energy flows across each 3×3 neighborhood, conserving the total and
+modeling how organisms “hijack” physics to persist ordered patterns.
+Cells inherit their parents’ crossed-over policy parameters upon
+reproduction and lose them at death, enabling evolutionary adaptation of
+energy‐management strategies.</p>
+<p>By fusing Life’s simple birth/death topology with energy–mass
+conversion, entropy considerations, and an evolvable neural CA policy,
+GoLEM aims to exhibit richer emergent phenomena—sustained oscillators,
+self-organized energy waves, and resource-driven pattern formation—that
+mirror how real organisms defy equilibrium to survive and replicate
+under thermodynamic constraints.</p>
+<h3 id="neat-coevolution-of-grass-and-prey">NEAT Coevolution of Grass
+and Prey</h3>
+<p>In this experiment, we simulate an abstract ecosystem of autotrophic
+“grass” and herbivorous “prey” on a toroidal grid, with both species’
+behaviors governed by evolvable neural controllers optimized via the
+NEAT algorithm. Each organism carries a genome that encodes a
+Compositional Pattern-Producing Network (CPPN), which in turn generates
+a phenotype neural network mapping local sensory inputs to action
+outputs.</p>
+<ul>
+<li><strong>Sensory Inputs:</strong>
+<ul>
+<li>Grass senses a <strong>3×3</strong> RGB patch of its immediate
+neighborhood to decide where to propagate or expend energy.<br />
+</li>
+<li>Prey senses a larger <strong>9×9</strong> RGB field, enabling more
+sophisticated foraging and avoidance strategies over a wider area.</li>
+</ul></li>
+<li><strong>Actions:</strong>
+<ul>
+<li><strong>Movement:</strong> networks output Δx, Δy vectors; prey use
+theirs to move toward nutrients or away from threats, consuming energy
+proportional to distance moved.<br />
+</li>
+<li><strong>Asexual Reproduction:</strong> when energy exceeds a
+threshold, an organism can clone itself into an adjacent empty
+cell.<br />
+</li>
+<li><strong>Sexual Reproduction (Prey only):</strong> if two prey
+mutually point at each other (each network’s Δx, Δy directs toward the
+other’s location) and both have sufficient energy, they produce a shared
+offspring in a neighboring empty site, combining and mutating both
+genomes.</li>
+</ul></li>
+<li><strong>Energy Dynamics:</strong>
+<ul>
+<li>Grass regenerates energy passively over time and must maintain a
+minimum to reproduce.<br />
+</li>
+<li>Prey gain energy by consuming grass when moving into a
+grass-occupied cell, and lose energy via movement and reproduction.
+Death occurs if energy falls to zero.</li>
+</ul></li>
+</ul>
+<p>By coevolving these simple sensory-motor networks, grasses adapt
+growth patterns that reduce predation risk, while prey evolve foraging
+tactics—clustering, dispersal, ambush—and even mutual breeding
+behaviors. Over thousands of generations, this setup yields rich
+ecological dynamics: spatial patchiness in grass, prey herding and
+avoidance, and arms-race feedback loops, illustrating how minimal neural
+controllers under selection can generate complex, lifelike
+interactions.</p>
+<hr />
+<h2 id="directory-structure">📂 Directory Structure</h2>
+<pre><code>.
+├── evo/                         # NEAT-based coevolution experiments
+│   ├── nn/                      # neural network modules
+│   │   ├── ffnn.py 
+│   │   ├── graphs.py            # network visualization and graph functions
+│   │   ├── phenotype_nn.py
+│   │   └── rnn.py
+│   ├── genome.py                # genome and evolutionary operators
+│   ├── functions.py             # activation functions
+│   ├── evolve.py                # Population class
+│   ├── game1.py                 # grass–herbivore sim
+│   └── config.py                # NEAT hyperparameters
+│
+├── physics/                     # GPU physics simulation
+│   ├── diffusion.cl             # OpenCL kernel
+│   ├── gump.jpg                 # input image
+│   └── game3.py                 # host code (PyOpenCL)
+│
+├── rd.py                        # Reaction–Diffusion CA
+├── golem.py                     # GoLEM: Game Of Life Energy-Mass
+│
+├── assemble_videos.sh           # Bash script to assemble MP4s
+├── plot_metrics.py              # Python script to generate plots
+├── out/                         # Auto-generated outputs
+│   ├── rd/
+│   │   ├── frames/
+│   │   └── metrics.csv
+│   ├── physics/
+│   │   ├── frames/
+│   │   ├── gpu_times.csv
+│   │   └── cpu_times.csv
+│   ├── golem/
+│   │   ├── frames/
+│   │   └── stats.csv
+│   ├── evo/
+│   │   ├── frames/
+│   │   └── metrics.csv
+│   ├── plots/
+│   │   ├── reaction_diffusion_means.png
+│   │   ├── physics_timing.png
+│   │   ├── golem_summary.png
+│   │   └── evo_population.png
+│   └── videos/                  # MP4s assembled by `assemble_videos.sh`
+│       ├── rd.mp4
+│       ├── physics.mp4
+│       ├── golem.mp4
+│       └── evo.mp4
+├── Pipfile                      # project dependencies
+├── Pipfile.lock
+└── README.md                    # ← you are here</code></pre>
+<hr />
+<h2 id="installation">⚙️ Installation</h2>
+<ol type="1">
+<li><p><strong>Clone</strong> this repository</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/jpsank/thesis.git</span></code></pre></div></li>
+<li><p><strong>Install dependencies</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pipenv</span> install</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pipenv</span> shell</span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> create <span class="at">-n</span> alife python=3.11</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate alife</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  numpy matplotlib pandas pyopencl torch <span class="dt">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  jax jaxlib networkx pygame imageio pygraphviz</span></code></pre></div></li>
+<li><p><strong>Ensure</strong> you have an OpenCL driver for your GPU
+(for GPU physics simulation)</p></li>
+</ol>
+<hr />
+<h2 id="running-experiments">🚀 Running Experiments</h2>
+<p>Activate your virtualenv and then run each script as follows:</p>
+<h3 id="reactiondiffusion-ca">1. Reaction–Diffusion CA</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> rd.py <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--width</span> 100 <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--height</span> 100 <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--dt</span> 0.1 <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--steps</span> 5000 <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--vis-interval</span> 10 <span class="dt">\</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> out/rd</span></code></pre></div>
+<h3 id="gpu-accelerated-physics-simulation-1">2. GPU-Accelerated Physics
+Simulation</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> physics <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input-image</span> physics/gump.jpg <span class="dt">\</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--width</span> 576 <span class="dt">\</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--height</span> 384 <span class="dt">\</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--steps</span> 500 <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--compare-cpu</span> <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> out/physics <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--display</span></span></code></pre></div>
+<h3 id="golem-game-of-life-energy-mass">3. GoLEM — Game Of Life
+Energy-Mass</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> golem.py <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--size</span> 150 <span class="dt">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--steps</span> 1000 <span class="dt">\</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> out/golem</span></code></pre></div>
+<h3 id="neat-coevolution-grass-prey">4. NEAT Coevolution (Grass &amp;
+Prey)</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> evo <span class="dt">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--steps</span> 5000 <span class="dt">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--save-interval</span> 10 <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> out/evo</span></code></pre></div>
+<hr />
+<h3 id="results-visualization">📈 Results &amp; Visualization</h3>
+<ol type="1">
+<li><p><strong>Assemble Videos</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./assemble_videos.sh</span></span></code></pre></div>
+<p>Generates:</p>
+<pre><code>out/videos/rd.mp4
+out/videos/physics.mp4
+out/videos/golem.mp4
+out/videos/evo.mp4</code></pre></li>
+<li><p><strong>Generate Plots</strong></p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> plot_metrics.py</span></code></pre></div>
+<p>Saves figures to <code>out/plots/</code>.</p></li>
+<li><p><strong>Direct Inspection</strong></p>
+<ul>
+<li><strong>Frames:</strong>
+<code>out/&lt;experiment&gt;/frames/*.png</code><br />
+</li>
+<li><strong>Metrics CSV:</strong> inspect with Pandas or Excel<br />
+</li>
+<li><strong>Plots:</strong> <code>out/plots/*.png</code></li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="results">📊 Results</h2>
+<h3 id="reactiondiffusion-chemistry-with-virtual-cells-grns-1">1.
+Reaction–Diffusion Chemistry with Virtual Cells &amp; GRNs</h3>
+<p><strong>Environmental Metrics</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 12%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: right;">Timestep</th>
+<th style="text-align: left;">H₂O</th>
+<th style="text-align: left;">CO₂</th>
+<th style="text-align: left;">O₂</th>
+<th style="text-align: left;">Sugar</th>
+<th style="text-align: left;">ATP</th>
+<th style="text-align: left;">Protein</th>
+<th style="text-align: left;">Mitogen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1.00000</td>
+<td style="text-align: left;">1.00000</td>
+<td style="text-align: left;">1.00000</td>
+<td style="text-align: left;">1.00006</td>
+<td style="text-align: left;">1.99998</td>
+<td style="text-align: left;">0.000001</td>
+<td style="text-align: left;">0.06094</td>
+</tr>
+<tr>
+<td style="text-align: right;">2999</td>
+<td style="text-align: left;">0.98448</td>
+<td style="text-align: left;">0.98409</td>
+<td style="text-align: left;">0.98109</td>
+<td style="text-align: left;">0.98825</td>
+<td style="text-align: left;">1.82319</td>
+<td style="text-align: left;">0.02165</td>
+<td style="text-align: left;">0.00383</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Population Metrics (at <em>T</em> = 2999)</strong><br />
+- <strong>Live‐cell count:</strong> 2<br />
+- <strong>Mean Internal ATP:</strong> 0.9116</p>
+<p><strong>Qualitative observations:</strong><br />
+1. <strong>Rapid mitogen‐driven expansion:</strong> Cells adjacent to
+the central mitogen patch divide explosively, creating an outward-moving
+front early in the run (Figure 1a at <em>t</em> = 50).<br />
+2. <strong>Trail-forming motility and tandem movement:</strong> Around
+<em>t</em> ≈ 860, motile cells leave detectable chemical trails and
+occasionally move in coordinated pairs (Figure 1b), reflecting emergent
+chemotactic following behavior.<br />
+3. <strong>Long-term survivors:</strong> By <em>t</em> = 3000, two cells
+remain alive (Figure 1c), suggesting evolved strategies for exploiting
+residual gradients or minimizing energy expenditure under resource
+scarcity.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/rd_frame_00050.png" /></th>
+<th style="text-align: center;"><img
+src="figs/rd_frame_00860.png" /></th>
+<th style="text-align: center;"><img
+src="figs/rd_frame_02990.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 1a:</strong> Early growth
+(<em>t</em> = 50)</td>
+<td style="text-align: center;"><strong>Figure 1b:</strong> Tandem
+motility (<em>t</em> = 860)</td>
+<td style="text-align: center;"><strong>Figure 1c:</strong> Survivors
+(<em>t</em> = 2990)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/reaction_diffusion_means.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 1d:</strong> Mean
+chemical concentrations over time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Discussion of RD Results (see “Discussion”
+below):</strong><br />
+- The slight decrease in H₂O, CO₂, and O₂ and the drop in mitogen
+reflect consumption by cell-mediated reactions, while ATP remains
+elevated from accumulated metabolic output.<br />
+- Emergent motility behavior confirms that simple transporter and motor
+channels, driven by neural network outputs, suffice to produce
+chemotactic-like dynamics without explicit movement rules.<br />
+- The persistence of two cells highlights the need for dynamic resource
+inputs—future work could introduce periodic mitogen or sugar influx to
+sustain a stable population.</p>
+<hr />
+<h3 id="gpu-accelerated-physics-simulation-2">2. GPU-Accelerated Physics
+Simulation</h3>
+<p><strong>Performance Metrics</strong><br />
+| Metric | Value | |————————-|————| | Avg. GPU time/step | 1.36 ms | |
+Avg. CPU time/step | 74.51 ms | | GPU → CPU Speedup | ×54.8 |</p>
+<p><strong>Qualitative Observations:</strong><br />
+1. <strong>Bubble-like air pockets:</strong> Pockets of the low-solidity
+“air” phase (with higher values of green color) spontaneously coalesce
+and rise through the higher-solidity solid (red) and “water” phase
+(blue), forming discrete collections of bubbles that ascend and escape
+at the top—reminiscent of lava-lamp dynamics (Figure 2a).<br />
+2. <strong>Persistent liquid trapping:</strong> The high-solidity
+“solid” phase (red) clumps together so strongly that water and even gass
+trapped beneath remains confined, producing under-solid fluid pockets
+(Figure 2b).<br />
+3. <strong>Layered material interactions:</strong> Over time, we observe
+layering where solids settle, liquids pool, and gases
+dissipate—demonstrating realistic phase separation and buoyancy effects
+driven by our simple solidity-based exchange rules (Figure 2c).</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/physics_frame_00100.png" /></th>
+<th style="text-align: center;"><img
+src="figs/physics_frame_00250.png" /></th>
+<th style="text-align: center;"><img
+src="figs/physics_frame_00400.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 2a:</strong> Bubble
+nucleation &amp; rise (<em>t</em> = 100)</td>
+<td style="text-align: center;"><strong>Figure 2b:</strong> Subsurface
+bubbles &amp; trapping (<em>t</em> = 250)</td>
+<td style="text-align: center;"><strong>Figure 2c:</strong> Surface
+clearance &amp; layering (<em>t</em> = 400)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/physics_timing.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 2d:</strong> Per-step
+timing comparison for GPU vs. CPU implementations</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Discussion of Physics Results (see “Discussion”
+below):</strong><br />
+- Although the visual output deviates from exact fluid dynamics, our
+diffusion and gravity formulas capture key lifelike behaviors—especially
+bubble formation, buoyant rise, and phase separation.<br />
+- Color-coding (blue = liquid, green = gas, red = solid) highlights
+these interactions vividly.<br />
+- GPU acceleration is critical: a ~55× speedup over the CPU baseline
+enables real-time exploration of material self-organization at
+scale.</p>
+<hr />
+<h3 id="golem-game-of-life-with-energymass-dynamics">3. GoLEM: Game Of
+Life with Energy–Mass Dynamics</h3>
+<p><strong>Equilibrium Metrics</strong><br />
+Initial transient gives way to a stable regime after a few dozen steps,
+when most mobile structures have died out.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Timestep</th>
+<th style="text-align: right;">Total Mass</th>
+<th style="text-align: right;">Total Energy</th>
+<th style="text-align: right;">Conserved Sum</th>
+<th style="text-align: right;">Live Cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3201.0</td>
+<td style="text-align: right;">1349.0</td>
+<td style="text-align: right;">4550.0</td>
+<td style="text-align: right;">3201</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2485.0</td>
+<td style="text-align: right;">2065.0</td>
+<td style="text-align: right;">4549.9</td>
+<td style="text-align: right;">2485</td>
+</tr>
+<tr>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">2466.0</td>
+<td style="text-align: right;">2084.0</td>
+<td style="text-align: right;">4550.0</td>
+<td style="text-align: right;">2466</td>
+</tr>
+<tr>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">2466.0</td>
+<td style="text-align: right;">2084.0</td>
+<td style="text-align: right;">4550.0</td>
+<td style="text-align: right;">2466</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Observations:</strong><br />
+1. <strong>Glider‐like oscillators:</strong> Shortly after random
+initialization, mobile glider‐like structures emerge (e.g., around
+<em>t</em> = 10) that traverse the grid under combined Life and energy
+rules (Figure 3b).<br />
+2. <strong>Transition to still‐life equilibrium:</strong> By <em>t</em>
+≈ 60, most gliders have burned out, leaving only small oscillators and
+novel still‐life configurations that are sustained by the introduced
+energy constraints—these stills do not appear in classical GoL
+(Figure 3c).<br />
+3. <strong>Conserved dynamics:</strong> After <em>t</em> = 60, total
+mass and energy fluctuate minimally around their conserved sum (~4550),
+and live‐cell count remains constant, indicating a true non‐trivial
+equilibrium enforced by energy‐mass routing.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/golem_frame_00000.png" /></th>
+<th style="text-align: center;"><img
+src="figs/golem_frame_00010.png" /></th>
+<th style="text-align: center;"><img
+src="figs/golem_frame_00060.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 3a:</strong> Random
+initialization (<em>t</em> = 0)</td>
+<td style="text-align: center;"><strong>Figure 3b:</strong> Glider‐like
+dynamics (<em>t</em> = 10)</td>
+<td style="text-align: center;"><strong>Figure 3c:</strong> Still‐life
+equilibrium (<em>t</em> = 60)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/golem_summary.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 3d:</strong> Total mass,
+energy, and live cells over time (note 1 mass = 1 live cell)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Discussion of GoLEM Results (see “Discussion”
+below):</strong><br />
+- Energy constraints transform classic GoL dynamics, suppressing
+unbounded glider proliferation and enabling novel still‐lifes not seen
+in the original automaton.<br />
+- The persistent still‐life patterns underscore how mass–energy
+conservation and routing policies can stabilize structures that would
+otherwise not survive.<br />
+- This equilibrium regime suggests potential for studying energy‐based
+pattern resilience and controlled perturbations to generate complex
+behaviors.</p>
+<blockquote>
+<p><em>Note:</em> A subtle yellow tint on dead (formerly white) cells
+and a red tint on live (formerly black) cells indicate higher energy
+levels.</p>
+</blockquote>
+<hr />
+<h3 id="neat-coevolution-of-grass-and-prey-1">4. NEAT Coevolution of
+Grass and Prey</h3>
+<p><strong>Population Metrics</strong><br />
+| Timestep | Grass Population | Prey Population | |———:|—————–:|—————-:|
+| 0 | 20 | 100 | | 800 | 737 | 152 | | 2000 | 412 | 215 | | 2325 | 150 |
+0 | | 4999 | 180 | 0 |</p>
+<p><strong>Qualitative Observations:</strong><br />
+1. <strong>Directional grass expansion (Figure 4a, <em>t</em> =
+200):</strong> Grass genomes evolve to favor reproduction in specific
+directions, yielding elongated patches rather than uniform spread.<br />
+2. <strong>Prey congregation and infiltration (Figure 4b, <em>t</em> =
+900):</strong> As grass patches mature, prey cluster at their edges,
+then evolve to penetrate into grass areas to feed directly on interior
+cells.<br />
+3. <strong>Aggressive infestation (Figure 4c, <em>t</em> =
+1500):</strong> Upon eating, prey proliferate in all directions from
+grazing sites, creating dense infestations that overrun grass
+clusters.<br />
+4. <strong>Prey extinction (Figure 4d, <em>t</em> = 2300):</strong>
+Unchecked reproduction depletes grass resources, causing prey to exhaust
+their energy budgets and drive themselves extinct; only grass remains
+thereafter.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/evo_frame_00200.png" /></th>
+<th style="text-align: center;"><img
+src="figs/evo_frame_00900.png" /></th>
+<th style="text-align: center;"><img
+src="figs/evo_frame_01540.png" /></th>
+<th style="text-align: center;"><img
+src="figs/evo_frame_02300.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 4a:</strong> Directional
+grass patches (<em>t</em> = 200)</td>
+<td style="text-align: center;"><strong>Figure 4b:</strong> Prey
+infiltration (<em>t</em> = 900)</td>
+<td style="text-align: center;"><strong>Figure 4c:</strong> Infestation
+outbreak (<em>t</em> = 1540)</td>
+<td style="text-align: center;"><strong>Figure 4d:</strong> Only one
+prey left, soon to die (<em>t</em> = 2300)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img
+src="figs/evo_population.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Figure 4e:</strong> Grass and
+prey populations over time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Discussion of NEAT Evo Results (see “Discussion”
+below):</strong><br />
+- Grass learns anisotropic spreading patterns, which prey exploit by
+clustering and penetrating clusters.<br />
+- Prey’s aggressive reproduction without negative feedback leads to
+resource exhaustion and self-extinction.<br />
+- Introducing evolutionary constraints—such as energy costs for
+reproduction beyond simple thresholds, or negative density-dependent
+effects—could stabilize long-term coexistence.</p>
+<hr />
+<h2 id="discussion">Discussion</h2>
+<p>Across these four experiments, we observe how simple local rules,
+when combined with conserved quantities and evolvable control, give rise
+to rich, lifelike behaviors:</p>
+<ol type="1">
+<li><strong>Emergence through Conservation Laws</strong>
+<ul>
+<li>In both the Reaction–Diffusion Chemistry and GoLEM experiments,
+enforcing conservation of mass and energy introduces nontrivial steady
+states.<br />
+</li>
+<li>The Chem RD model collapses without sustained inputs, whereas
+GoLEM’s routing policy stabilizes populations into persistent
+still‐lifes, illustrating how active resource management alters CA
+dynamics.</li>
+</ul></li>
+<li><strong>Chemotactic and Motility Behaviors</strong>
+<ul>
+<li>Cells in the Chem RD model exhibit trail‐following and tandem
+movements purely through transporter and motor channels driven by GRN
+outputs—no explicit movement code was needed.<br />
+</li>
+<li>In GoLEM, glider‐like oscillators metamorphose into novel
+energy‐bounded stills, indicating that neural routing of conserved
+resources can stabilize or extinguish classical CA motifs.</li>
+</ul></li>
+<li><strong>Phase Separation and Material Self‐Organization</strong>
+<ul>
+<li>The GPU physics CA, inspired by Biomaker CA, demonstrates how a
+single “solidity” parameter per phase yields realistic layering, bubble
+nucleation, and buoyant rise.<br />
+</li>
+<li>A ~55× GPU speedup over CPU makes real‐time exploration feasible,
+highlighting the importance of hardware acceleration for large-scale
+artificial‐life simulations.</li>
+</ul></li>
+<li><strong>Coevolutionary Dynamics and Failure Modes</strong>
+<ul>
+<li>Grass and prey coevolution under NEAT pressures yields sequential
+strategies—directional expansion, prey infiltration,
+infestation—mirroring ecological arms races.<br />
+</li>
+<li>The prey‑driven extinction event underscores the need for regulatory
+feedback (e.g., resource signaling, density‐dependent costs) to sustain
+long‐term coexistence.</li>
+</ul></li>
+<li><strong>Interplay of Biology and Abstraction</strong>
+<ul>
+<li>Abstracting biological processes (e.g., metabolism, transport,
+division) into minimal channels and networks allows focus on fundamental
+principles—conservation, diffusion, evolution—without overfitting to
+specific biological systems.<br />
+</li>
+<li>Yet, each model remains extensible: we can add new reactions,
+feedback loops, or physical forces to probe further into the origins of
+life‐like phenomena.</li>
+</ul></li>
+</ol>
+<p>Overall, these experiments chart a spectrum from purely chemical
+pattern‐formation to agent‐based coevolution, unified by core ideas of
+resource conservation, local decision‐making, and emergent organization.
+They demonstrate that even vastly simplified proxies for metabolism,
+physics, and evolution can produce behaviors reminiscent of real life,
+laying groundwork for future artificial‐life frameworks that integrate
+chemistry, mechanics, and adaptive control.</p>
+<hr />
+<h2 id="conclusions">Conclusions</h2>
+<p>This thesis explored four distinct yet thematically linked
+experiments that demonstrate how simple local rules, conserved
+resources, and evolvable control can give rise to rich, lifelike
+phenomena:</p>
+<ol type="1">
+<li><p><strong>Reaction–Diffusion Chemistry with Virtual Cells &amp;
+GRNs</strong> showed that embedding cells with minimal internal
+chemistry and gene regulatory networks into a reaction–diffusion medium
+yields emergent motility, chemotactic trails, and resource‐limited
+population dynamics. While the system collapsed without sustained
+nutrient inputs, it evidenced genuine gradient‐driven behavior and
+hinted at strategies for indefinite persistence.</p></li>
+<li><p><strong>GPU-Accelerated Physics Simulation</strong> distilled
+material interactions to a single “solidity” proxy per phase and two
+local exchange laws, reproducing bubble formation, buoyant rise, and
+phase separation. A ∼55× GPU speedup over CPU illustrates the power of
+data-parallel compute for scaling artificial-life environments.</p></li>
+<li><p><strong>GoLEM: Game of Life with Energy–Mass Dynamics</strong>
+reinterpreted Conway’s CA through the lens of energy-mass equivalence
+and conservation. By coupling birth/death rules with an evolved neural
+routing policy, GoLEM transitions from transient glider oscillations to
+novel still‐life equilibria, revealing how resource constraints
+stabilize patterns beyond classical GoL.</p></li>
+<li><p><strong>NEAT Coevolution of Grass &amp; Prey</strong> implemented
+a minimalist ecosystem in which grasses and herbivores coevolve
+sensory-motor networks under NEAT. The run of sequential strategic
+phases—directional grass patches, prey infiltration, infestation, and
+eventual prey extinction—highlights both the creative potential and
+pitfalls of open-ended evolution without regulatory feedback.</p></li>
+</ol>
+<p>Taken together, these studies underscore that even highly abstracted
+models—whether chemical, physical, or ecological—can reproduce core
+aspects of living systems: metabolism, movement, growth, adaptation, and
+self-organization. Conserved quantities (mass, energy) and simple
+control architectures (GRNs, neural policies, NEAT-evolved networks)
+provide a unifying framework for artificial-life research. The work lays
+a foundation for future investigations into sustained self-organization,
+multi-scale coupling of chemistry and mechanics, and evolvable life-like
+systems that bridge the gap between minimal models and biological
+complexity.</p>
+<hr />
+<h2 id="future-work">Future Work</h2>
+<p>Building on these four experiments, several avenues can deepen our
+understanding of artificial-life systems and push the models closer to
+biological realism:</p>
+<ol type="1">
+<li><strong>Dynamic Resource Influx &amp; Homeostasis</strong>
+<ul>
+<li>Introduce periodic or spatially distributed nutrient and mitogen
+sources in the Reaction–Diffusion Chemistry model to sustain populations
+and study steady‐state diversity.<br />
+</li>
+<li>Implement feedback‐regulated background reactions (e.g.,
+photosynthetic sugar synthesis) to model external energy inputs.</li>
+</ul></li>
+<li><strong>Parameter Sweeps and Phase Diagrams</strong>
+<ul>
+<li>Systematically vary key parameters (diffusion rates, reaction cost
+coefficients, energy leak rates, solidity values) to map emergent
+behavior regimes (e.g., pattern formation, oscillatory phases,
+extinction thresholds).<br />
+</li>
+<li>Employ automated grid searches and sensitivity analysis to identify
+bifurcation points and critical transitions in each model.</li>
+</ul></li>
+<li><strong>Enhanced GRN Architectures</strong>
+<ul>
+<li>Expand the gene regulatory network model with additional channel
+types (e.g., signaling peptides, receptor analogs) to explore richer
+cell–cell communication and differentiation protocols.<br />
+</li>
+<li>Compare discrete logical GRNs versus continuous neural‐net proxies
+to assess trade-offs in evolvability and behavioral complexity.</li>
+</ul></li>
+<li><strong>3D Extension and Multiscale Coupling</strong>
+<ul>
+<li>Generalize the Reaction–Diffusion and Physics CAs to three
+dimensions, coupling volumetric diffusion with 3D cell populations or
+fluid–solid interactions.<br />
+</li>
+<li>Integrate biomechanical forces (e.g., adhesion, pressure) with
+chemical and energetic dynamics to model tissue‐like growth and
+morphogenesis.</li>
+</ul></li>
+<li><strong>Stabilizing Coevolutionary Feedbacks</strong>
+<ul>
+<li>In the NEAT ecosystem, introduce negative feedback mechanisms (e.g.,
+resource signaling, disease spread, density‐dependent reproduction
+costs) to prevent runaway extinction and achieve long‐term
+coexistence.<br />
+</li>
+<li>Investigate tournament and island‐model coevolution setups to foster
+spatially heterogeneous evolutionary dynamics.</li>
+</ul></li>
+<li><strong>Benchmarking &amp; Real‐Time Interaction</strong>
+<ul>
+<li>Package the GPU‐Accelerated Physics simulation as an interactive
+tool (e.g., with UI sliders for solidity or diffusion) to explore
+material behaviors in real time.<br />
+</li>
+<li>Profile and optimize neural routing CA implementations for
+deployment on WebGL or mobile GPUs, enabling broader accessibility.</li>
+</ul></li>
+<li><strong>Integration into a Unified Artificial‐Life
+Framework</strong>
+<ul>
+<li>Develop a modular platform where chemical, physical, and ecological
+CAs can be composed—e.g., embedding motile cells from the Chem RD model
+into GOLEM or coupling grass–prey agents with underlying fluid
+flows.<br />
+</li>
+<li>Leverage standardized interfaces (e.g., JSON or YAML configs) to
+orchestrate hybrid simulations and facilitate reproducible
+research.</li>
+</ul></li>
+</ol>
+<p>By pursuing these directions, we can progressively bridge minimal
+artificial-life models and more comprehensive in silico ecosystems,
+offering insights into the fundamental principles that underlie living
+systems and their emergence from simple rules.</p>
+<hr />
+<h2 id="citation">📖 Citation</h2>
+<p>If you use this code or the experiments in your work, please
+cite:</p>
+<blockquote>
+<p>Julian Sanker, “GPU-Accelerated Agent-Based Simulation for Cell
+Dynamics,” Senior Thesis, Yale University, 2025.</p>
+</blockquote>
+<hr />
+<h2 id="license">📝 License</h2>
+<p>This project is released under the MIT License. See <a
+href="LICENSE">LICENSE</a> for details.</p>
+</body>
+</html>
