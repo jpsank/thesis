@@ -4,18 +4,28 @@ A collection of four core experiments exploring artificial-life and computationa
 
 1. **Reaction–Diffusion CA** (`rd.py`)  
 2. **GPU-Accelerated Physics Simulation** (`physics/__main__.py` + `diffusion.cl`)  
-3. **GOLEM: Game Of Life Energy-Mass** (`golem.py`)  
+3. **GoLEM: Game Of Life with Energy-Mass equivalence** (`golem.py`)  
 4. **NEAT Coevolution (Grass & Prey)** (`evo/__main__.py`)
 
 ---
 
 ## Methodology
 
-### Reaction–Diffusion Chemistry with Virtual Cells and GRNs  
-We model a two-dimensional grid as a multi-chemical reaction–diffusion medium populated by “cells” that maintain their own internal chemistry. The environment carries seven continuous species—water, carbon dioxide, oxygen, sugar, ATP, protein and a generic mitogen—that diffuse according to Fick’s law and react via a unified reaction list. Some reactions proceed slowly in the background; others are catalyzed within cells based on their internal state. Each cell occluded on a grid site holds internal channels mirroring key chemicals and abstract regulatory signals. A gene regulatory network (GRN) at each cell takes as input local environmental concentrations and its internal channels, then outputs modifications to internal and membrane-transporter channels at an ATP cost. When mitogen levels and resources exceed thresholds, cells divide—splitting internal contents and copying the GRN with mutation—while cells starved of ATP die and release their contents back into the field. This framework enables emergent gradient formation, metabolism-driven patterning, and “synthetic biology” behaviors such as differentiation-like effects and signal-triggered proliferation.
+### Reaction–Diffusion Chemistry with Virtual Cells & GRNs
+
+Building on agent-based models of cancer and immune dynamics (e.g. the Krishnaswamy Lab’s EuclideanSimulation), this experiment abstracts away biochemical and cell-type specifics to focus on fundamental life principles. The two-dimensional grid carries seven continuous species—water, CO₂, O₂, sugar, ATP, protein, and a generic mitogen—that diffuse per Fick’s law and react via a unified reaction list with both background and cell-catalyzed rates.  
+
+Each cell occupies one grid site and maintains **three functional channels** for every chemical:  
+1. **Reaction channel** (enzymes): positive values catalyze production reactions; negative values catalyze consumption.  
+2. **Transport channel** (transporters): controls active import or export against gradients.  
+3. **Motor channel** (motors): dictates energy-driven movement toward or away from chemical cues.  
+
+Channels are driven by a small, evolvable neural network that takes environmental concentrations and a cell’s current channels as inputs and outputs channel update values at an ATP cost—abstracting gene-to-protein translation and receptor dynamics into a unified, energy-conscious decision process. When mitogen and resource thresholds are met, cells divide—splitting chemical resources and mutating network weights—while ATP depletion or lifespan limits trigger death and release of internal contents back into the field.  
+
+This minimal yet biologically inspired framework emphasizes **metabolism**, **chemotaxis**, **transport**, and **division** as the core capabilities of life, enabling emergent gradient formation, differentiation-like cycles, and synthetic-biology behaviors without hard-coding specialized cell types.  
 
 ### GPU-Accelerated Physics Simulation
-This experiment takes inspiration from the Biomaker CA framework ([Mordvintsev et al.](https://google-research.github.io/self-organising-systems/2023/biomaker-ca/)), which simulates a richly typed biome via simple, local cellular-automaton rules. Rather than hard-coding several cell types like they do (stem, leaf, root, seed, air, dirt, etc.), we abstract every material down to its **intermolecular force** characteristics. Each pixel's RGBA color represents a four-channel “phase” vector (solid, gas, liquid, void), and we assign each phase a **solidity** parameter that proxies bond strength—strong ionic/covalent bonds for solids, hydrogen bonds for liquids, and weak London forces for gases.
+This experiment takes inspiration from the Biomaker CA framework ([Randazzo et al.](https://google-research.github.io/self-organising-systems/2023/biomaker-ca/)), which simulates a richly typed biome via simple, local cellular-automaton rules. Rather than hard-coding several cell types like they do (stem, leaf, root, seed, air, dirt, etc.), we abstract every material down to its **intermolecular force** characteristics. Each pixel's RGBA color represents a four-channel “phase” vector (solid, gas, liquid, void), and we assign each phase a **solidity** parameter that proxies bond strength—strong ionic/covalent bonds for solids, hydrogen bonds for liquids, and weak London forces for gases.
 
 At each time step, an OpenCL kernel runs over the grid and applies two core local exchanges:
 
@@ -26,11 +36,31 @@ By tuning solidity values (e.g. 0.999 for rock, 0.5 for water, 0.001 for air), w
 
 This experiment unifies falling-sand dynamics and fluid behavior, which could be useful in future artificial-life models that integrate material physics with metabolism, chemotaxis, and multicellular mechanics.
 
-### GOLEM: Game Of Life Energy–Mass  
-We extend Conway’s Game of Life by equipping each cell with explicit mass and energy quantities. In each tick, standard Life birth/death rules fire first, consuming or releasing mass and energy locally. Next, an “energy-mass routing” policy network—trained separately or evolved—computes per-cell demand, and available energy is redistributed conservatively across a 3×3 neighborhood before a small diffusion and leak step smooths the field. This transforms the binary automaton into a dissipative, resource-driven system whose emergent behaviors reflect both neighborhood topology and thermodynamic constraints.
+### GoLEM: Game Of Life with Energy–Mass equivalence  
+This experiment reimagines Conway’s Game of Life as a miniature physics sandbox governed by conservation laws and entropy. Inspired by Einstein’s $E=mc^2$, we treat mass and energy as interconvertible yet globally conserved quantities: a cell birth consumes one unit of energy, and a cell death releases that energy back into the field. In the absence of life, the system tends toward “entropy”–increasing equilibrium under standard Life rules.  
 
-### NEAT Coevolution of Grass and Prey  
-We simulate two interacting populations—autotrophic “grass” and herbivorous “prey”—on a toroidal grid. Each individual carries a genome encoding a neural controller evolved via the NEAT algorithm. At each time step, organisms sense a local RGB neighborhood representing resource and agent distributions, forward these inputs through their phenotype network, and decide actions such as movement or reproduction. Actions consume or replenish an energy budget; individuals die when energy is depleted and reproduce when it exceeds a threshold, producing mutated offspring. Predator–prey dynamics emerge as grass evolves evasive or clustered growth patterns while prey evolve foraging and avoidance strategies, illustrating coevolution in a resource-constrained environment.  
+To capture how living patterns locally decrease entropy, each cell carries both mass and energy stores and participates in a learned, decentralized energy‐routing process. We augment the binary GoL grid with a continuous energy channel plus a set of hidden “genome” channels. A neural‐policy CA—analogous to [Growing Neural Cellular Automata](https://distill.pub/2020/growing-ca/)—reads local mass, energy, and hidden channels, then directs energy flows across each 3×3 neighborhood, conserving the total and modeling how organisms “hijack” physics to persist ordered patterns. Cells inherit their parents' crossed-over policy parameters upon reproduction and lose them at death, enabling evolutionary adaptation of energy‐management strategies.  
+
+By fusing Life’s simple birth/death topology with energy–mass conversion, entropy considerations, and an evolvable neural CA policy, GoLEM aims to exhibit richer emergent phenomena—sustained oscillators, self-organized energy waves, and resource-driven pattern formation—that mirror how real organisms defy equilibrium to survive and replicate under thermodynamic constraints.  
+
+### NEAT Coevolution of Grass and Prey
+
+In this experiment, we simulate an abstract ecosystem of autotrophic “grass” and herbivorous “prey” on a toroidal grid, with both species’ behaviors governed by evolvable neural controllers optimized via the NEAT algorithm. Each organism carries a genome that encodes a Compositional Pattern-Producing Network (CPPN), which in turn generates a phenotype neural network mapping local sensory inputs to action outputs.
+
+- **Sensory Inputs:**  
+  - Grass senses a **3×3** RGB patch of its immediate neighborhood to decide where to propagate or expend energy.  
+  - Prey senses a larger **9×9** RGB field, enabling more sophisticated foraging and avoidance strategies over a wider area.
+
+- **Actions:**  
+  - **Movement:** networks output Δx, Δy vectors; prey use theirs to move toward nutrients or away from threats, consuming energy proportional to distance moved.  
+  - **Asexual Reproduction:** when energy exceeds a threshold, an organism can clone itself into an adjacent empty cell.  
+  - **Sexual Reproduction (Prey only):** if two prey mutually point at each other (each network’s Δx, Δy directs toward the other’s location) and both have sufficient energy, they produce a shared offspring in a neighboring empty site, combining and mutating both genomes.
+
+- **Energy Dynamics:**  
+  - Grass regenerates energy passively over time and must maintain a minimum to reproduce.  
+  - Prey gain energy by consuming grass when moving into a grass-occupied cell, and lose energy via movement and reproduction. Death occurs if energy falls to zero.
+
+By coevolving these simple sensory-motor networks, grasses adapt growth patterns that reduce predation risk, while prey evolve foraging tactics—clustering, dispersal, ambush—and even mutual breeding behaviors. Over thousands of generations, this setup yields rich ecological dynamics: spatial patchiness in grass, prey herding and avoidance, and arms-race feedback loops, illustrating how minimal neural controllers under selection can generate complex, lifelike interactions.  
 
 ## 📂 Directory Structure
 
@@ -54,7 +84,7 @@ We simulate two interacting populations—autotrophic “grass” and herbivorou
 │   └── game3.py                 # host code (PyOpenCL)
 │
 ├── rd.py                        # Reaction–Diffusion CA
-├── golem.py                     # GOLEM: Game Of Life Energy-Mass
+├── golem.py                     # GoLEM: Game Of Life Energy-Mass
 │
 ├── assemble_videos.sh           # Bash script to assemble MP4s
 ├── plot_metrics.py              # Python script to generate plots
@@ -140,7 +170,7 @@ python -m physics \
   --display
 ```
 
-### 3. GOLEM — Game Of Life Energy-Mass  
+### 3. GoLEM — Game Of Life Energy-Mass  
 ```bash
 python golem.py \
   --size 150 \
@@ -191,7 +221,7 @@ python -m evo \
 |------------------------------------|---------------------------------------------------------------------|------------------------------------------------------------------|---------------------------|---------------------------------------------|
 | **Reaction–Diffusion CA**          | `--width=100 --height=100 --dt=0.1 --steps=1000`                    | Mean SUGAR at t=1000: **0.985** (from `out/rd/metrics.csv`)                | `out/videos/rd.mp4`       | `out/plots/reaction_diffusion_means.png`    |
 | **GPU Physics Simulation**         | `--width=576 --height=384 --steps=500 --compare-cpu`                | Avg GPU time/step: **1.362ms** (from `out/physics/gpu_times.csv`)            | `out/videos/physics.mp4`  | `out/plots/physics_timing.png`             |
-| **GOLEM (Game Of Life E-M)**       | `--size=150 --steps=1000`                   | Live cells at t=1000: **2466** (from `out/golem/stats.csv`)               | `out/videos/golem.mp4`    | `out/plots/golem_summary.png`              |
+| **GoLEM (Game Of Life E-M)**       | `--size=150 --steps=1000`                   | Live cells at t=1000: **2466** (from `out/golem/stats.csv`)               | `out/videos/golem.mp4`    | `out/plots/golem_summary.png`              |
 | **NEAT Coevolution (Grass & Prey)**| `--steps=5000 --save-interval=10` | Prey population at t=5000: **0** (from `out/evo/metrics.csv`)         | `out/videos/evo.mp4`      | `out/plots/evo_population.png`             |
 
 ---
