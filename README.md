@@ -9,6 +9,64 @@ A collection of four core experiments exploring artificial-life and computationa
 
 ---
 
+## Acknowledgements
+
+I am grateful to my advisor, Dr. Smita Krishnaswamy, for her guidance and encouragement throughout this project. Thanks to Xingzhi Sun and Jake Kovalic for introducing me to the agent-based modeling ideas that inspired part of this work.
+
+Warm thanks to my friends in the Computer Science Department and my peers in Davenport College—our discussions over tea, coffee, or after a run were invaluable for troubleshooting and brainstorming.
+
+Finally, I owe my deepest appreciation to my parents and brother for bearing with my sometimes obsessive focus on these simulations and for their constant support.  
+
+---
+
+## Table of Contents
+
+- [ALife Simulation Suite](#alife-simulation-suite)
+  - [Acknowledgements](#acknowledgements)
+  - [Table of Contents](#table-of-contents)
+  - [Abstract](#abstract)
+  - [Methodology](#methodology)
+    - [Reaction–Diffusion Chemistry with Virtual Cells \& GRNs](#reactiondiffusion-chemistry-with-virtual-cells--grns)
+    - [GPU-Accelerated Physics Simulation](#gpu-accelerated-physics-simulation)
+    - [GoLEM: Game Of Life with Energy–Mass equivalence](#golem-game-of-life-with-energymass-equivalence)
+    - [NEAT Coevolution of Grass and Prey](#neat-coevolution-of-grass-and-prey)
+  - [📂 Directory Structure](#-directory-structure)
+  - [⚙️ Installation](#️-installation)
+  - [🚀 Running Experiments](#-running-experiments)
+    - [1. Reaction–Diffusion CA](#1-reactiondiffusion-ca)
+    - [2. GPU-Accelerated Physics Simulation](#2-gpu-accelerated-physics-simulation)
+    - [3. GoLEM — Game Of Life Energy-Mass](#3-golem--game-of-life-energy-mass)
+    - [4. NEAT Coevolution (Grass \& Prey)](#4-neat-coevolution-grass--prey)
+    - [📈 Results \& Visualization](#-results--visualization)
+  - [📊 Results](#-results)
+    - [1. Reaction–Diffusion Chemistry with Virtual Cells \& GRNs](#1-reactiondiffusion-chemistry-with-virtual-cells--grns)
+    - [2. GPU-Accelerated Physics Simulation](#2-gpu-accelerated-physics-simulation-1)
+    - [3. GoLEM: Game Of Life with Energy–Mass Dynamics](#3-golem-game-of-life-with-energymass-dynamics)
+    - [4. NEAT Coevolution of Grass and Prey](#4-neat-coevolution-of-grass-and-prey)
+  - [Discussion](#discussion)
+  - [Conclusions](#conclusions)
+  - [Future Work](#future-work)
+  - [📖 Citation](#-citation)
+  - [📝 License](#-license)
+
+---
+
+## Abstract
+
+Life emerges from the interaction of simple physical and chemical processes under constraints of energy and matter. In this thesis, I investigate four computational models—each built on minimal local rules and conserved quantities—to explore how lifelike behaviors arise in silico.  
+
+First, a **reaction–diffusion chemistry** framework embeds virtual cells, endowed with internal chemical channels and gene regulatory networks (GRNs), within a diffusive medium of seven species (H₂O, CO₂, O₂, sugar, ATP, protein, mitogen). Cells sense and respond to local gradients, exhibiting chemotactic trails and tandem motility before resource depletion drives near‐extinction.  
+
+Second, a **GPU-accelerated physics cellular automaton** abstracts material phases (solid, liquid, gas, void) through a single “solidity” parameter per pixel. Simple gravity‐ and diffusion‐like exchanges, executed in parallel on the GPU, generate bubble nucleation, buoyant rise, and phase separation—achieved at a ∼55× speedup over a NumPy baseline.  
+
+Third, **GOLEM** extends Conway’s Game of Life by equipping each cell with explicit mass and energy stores and routing energy with an evolvable neural CA policy. Here, birth and death events consume and release energy, yielding novel still‐life equilibria and transient glider oscillators stabilized by conservation laws.  
+
+Finally, a **NEAT‐driven grass–prey coevolution** simulates autotrophs and herbivores whose neural controllers evolve sensory‐motor strategies. Grass patches develop directional growth, prey learn infiltration and overexploitation tactics, and unchecked predation leads to self‐extinction, highlighting the need for regulatory feedback in open‐ended evolution.  
+
+Together, these experiments demonstrate that simple, physically motivated rules—paired with minimal control architectures and hardware acceleration—can reproduce core aspects of life: metabolism, movement, growth, adaptation, and self‐organization. This work lays a foundation for future artificial‐life frameworks that integrate chemistry, mechanics, and adaptive control across scales.  
+
+---
+
 ## Methodology
 
 ### Reaction–Diffusion Chemistry with Virtual Cells & GRNs
