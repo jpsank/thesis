@@ -87,7 +87,7 @@ def parse_args():
     p.add_argument("--width",       type=int,   default=100,    help="Grid width")
     p.add_argument("--height",      type=int,   default=100,    help="Grid height")
     p.add_argument("--dt",          type=float, default=0.1,    help="Time step")
-    p.add_argument("--steps",       type=int,   default=1000,   help="Total iterations")
+    p.add_argument("--steps",       type=int,   default=3000,   help="Total iterations")
     p.add_argument("--vis-interval",type=int,   default=10,     help="Frames every N steps")
     p.add_argument("--output-dir",  type=str,   default="out/rd", help="Where to save frames & metrics")
     return p.parse_args()
