@@ -245,10 +245,6 @@ python -m evo \
 |:---------------------------------------:|
 | **Figure 1d:** Mean chemical concentrations over time |
 
-| ![](out/videos/rd.mp4) |
-|:---------------------------------------:|
-| **Figure 1e:** Video of the RD simulation over time |
-
 **Discussion of RD Results (see “Discussion” below):**  
 - The slight decrease in H₂O, CO₂, and O₂ and the drop in mitogen reflect consumption by cell-mediated reactions, while ATP remains elevated from accumulated metabolic output.  
 - Emergent motility behavior confirms that simple transporter and motor channels, driven by neural network outputs, suffice to produce chemotactic-like dynamics without explicit movement rules.  
@@ -277,10 +273,6 @@ python -m evo \
 | ![](out/plots/physics_timing.png) |
 |:---------------------------------------:|
 | **Figure 2d:** Per-step timing comparison for GPU vs. CPU implementations |
-
-| ![](out/videos/physics.mp4) |
-|:---------------------------------------:|
-| **Figure 2e:** Video of the physics simulation over time |
 
 **Discussion of Physics Results (see “Discussion” below):**  
 - Although the visual output deviates from exact fluid dynamics, our diffusion and gravity formulas capture key lifelike behaviors—especially bubble formation, buoyant rise, and phase separation.  
@@ -313,10 +305,6 @@ Initial transient gives way to a stable regime after a few dozen steps, when mos
 | ![](out/plots/golem_summary.png) |
 |:---------------------------------------:|
 | **Figure 3d:** Total mass, energy, and live cells over time (note 1 mass = 1 live cell) |
-
-| ![](out/videos/golem.mp4) |
-|:---------------------------------------:|
-| **Figure 3e:** Video of the GoLEM simulation over time |
 
 **Discussion of GoLEM Results (see “Discussion” below):**  
 - Energy constraints transform classic GoL dynamics, suppressing unbounded glider proliferation and enabling novel still‐lifes not seen in the original automaton.  
@@ -351,10 +339,6 @@ Initial transient gives way to a stable regime after a few dozen steps, when mos
 | ![](out/plots/evo_population.png) |
 |:-----------------------------------:|
 | **Figure 4e:** Grass and prey populations over time |
-
-| ![](out/videos/evo.mp4) |
-|:-----------------------------------:|
-| **Figure 4f:** Video of the NEAT coevolution simulation over time |
 
 **Discussion of NEAT Evo Results (see “Discussion” below):**  
 - Grass learns anisotropic spreading patterns, which prey exploit by clustering and penetrating clusters.  
